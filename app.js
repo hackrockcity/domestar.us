@@ -33,8 +33,9 @@ function handleConnect(ws) {
 }
 
 function handlePhoneMessage(ws, msg) {
-	console.log("msg from %s: %s", ws.id, msg);
-	msg = JSON.stringify({ "id": ws.id, "data": JSON.parse(msg) });
+	var parsed = JSON.parse(msg);
+	console.log("msg from %s: %s", parsed.id, msg);
+
 	for (var i in domes) {
 		try { domes[i].send(msg); }
 		catch (e) { delete(domes[i]); }
