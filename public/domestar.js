@@ -97,5 +97,6 @@ function handleTick(e) {
 
 function handleModeToggle(e) {
 	mode = document.getElementById('modeswitch').checked ? "orb" : "line";
+	state['m'] = mode;
 	console.log("Mode: %s", mode);
 }
