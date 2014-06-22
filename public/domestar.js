@@ -5,6 +5,7 @@ var wsRemoteUrl = "ws://ws.domestar.us:8000/phone";
 var wsl;
 var wsr;
 var lastTick;
+var singleMode;
 
 setup();
 
@@ -16,6 +17,8 @@ function setup() {
 	setupButtons();
 	wsl = setupWebsocket(wsLocalUrl);
 	wsr = setupWebsocket(wsRemoteUrl);
+	singleMode = document.getElementById('modeswitch').checked;
+	document.getElementById('modeswitch').addEventListener('click', handleModeToggle, true);
 }
 
 function genid() {
@@ -91,3 +94,7 @@ function handleTick(e) {
 		wsr.send(msg);
 }
 
+function handleModeToggle(e) {
+	singleMode = document.getElementById('modeswitch').checked;
+	console.log("Single orb mode: %s", singleMode);
+}

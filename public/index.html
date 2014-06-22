@@ -3,6 +3,7 @@
 <head>
 	<title>DomeStar</title>
 	<link rel="stylesheet" type="text/css" href="domestar.css" />
+	<link rel="stylesheet" type="text/css" href="switch.css" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
@@ -10,6 +11,14 @@
 </head>
 <body>
 	<div id="buttons"></div>
+	<div id="orbmode" class="onoffswitch">
+    		<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="modeswitch" checked>
+    		<label class="onoffswitch-label" for="modeswitch">
+        		<span class="onoffswitch-inner"></span>
+        		<span class="onoffswitch-switch"></span>
+    		</label>
+	</div>
+
 	<script src="domestar.js" type="text/javascript"></script>
 </body>
 </html>
