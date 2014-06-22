@@ -5,7 +5,7 @@ var wsRemoteUrl = "ws://ws.domestar.us:8000/phone";
 var wsl;
 var wsr;
 var lastTick;
-var singleMode;
+var mode = "orb";
 
 setup();
 
@@ -15,10 +15,11 @@ function setup() {
 	}
 
 	setupButtons();
+
+	document.getElementById('modeswitch').addEventListener('click', handleModeToggle, true);
+
 	wsl = setupWebsocket(wsLocalUrl);
 	wsr = setupWebsocket(wsRemoteUrl);
-	singleMode = document.getElementById('modeswitch').checked;
-	document.getElementById('modeswitch').addEventListener('click', handleModeToggle, true);
 }
 
 function genid() {
@@ -95,6 +96,6 @@ function handleTick(e) {
 }
 
 function handleModeToggle(e) {
-	singleMode = document.getElementById('modeswitch').checked;
-	console.log("Single orb mode: %s", singleMode);
+	mode = document.getElementById('modeswitch').checked ? "orb" : "line";
+	console.log("Mode: %s", mode);
 }
