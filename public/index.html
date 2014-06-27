@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>DomeStar</title>
+	<link rel="stylesheet" type="text/css" href="octicons.css" />
 	<link rel="stylesheet" type="text/css" href="domestar.css" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -9,7 +10,33 @@
 
 </head>
 <body>
-	<div id="buttons"></div>
+	<div id="controls">
+		<div id="buttons"></div>
+		<input type="range" id="size_duration" min="1" max="9" value="5" />
+		<div id="icons" class="icons">
+			<div id="calibrate" class="icon mega-octicon octicon-tools inactive"></div>
+			<div id="flame" class="icon mega-octicon octicon-flame inactive"></div>
+			<div id="pulse" class="icon mega-octicon octicon-pulse inactive"></div>
+			<div id="paint" class="icon mega-octicon octicon-paintcan inactive"></div>
+		</div>
+	</div>
+
+	<div id="calibration" class="hidden overlay">
+		<div id="closeCalibration" class="octicon octicon-x"></div>
+		<h2>Calibration</h2>
+
+		<p>Hold phone like a TV remote</p>
+		<p>Point at a totem</p>
+		<p>Press the matching icon</p>
+		<p>Repeat for all four</p>
+
+		<div id="calibrationIcons" class="icons">
+			<div id="calibrateN" class="icon mega-octicon octicon-rocket not-ready"></div>
+			<div id="calibrateE" class="icon mega-octicon octicon-squirrel not-ready"></div>
+			<div id="calibrateS" class="icon mega-octicon octicon-beer not-ready"></div>
+			<div id="calibrateW" class="icon mega-octicon octicon-globe not-ready"></div>
+		</div>
+	</div>
 	<script src="domestar.js" type="text/javascript"></script>
 </body>
 </html>
