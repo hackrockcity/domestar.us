@@ -1,4 +1,4 @@
-var state = { "id":genid(), "a":0, "b":0, "g":0, "s":5, "c":0 };
+var state = { "id":genid(), "a":0, "b":0, "g":0, "s":5, "c":0, "f":0, "p":0, "P":0 };
 var calibration = getCalibration(); 
 var timer;
 var wsLocalUrl = "ws://wsl.domestar.us:8000/phone";
@@ -71,6 +71,9 @@ function setupIcons() {
 	setupIcon("calibrateS", handleCalibrate);
 	setupIcon("calibrateW", handleCalibrate);
 	setupIcon("closeCalibration", handleStopCalibration);
+	setupIcon("flame", getToggleHandler("f"));
+	setupIcon("pulse", getToggleHandler("p"));
+	setupIcon("paint", getToggleHandler("P"));
 }
 
 // Update state with device orientation
@@ -200,4 +203,10 @@ function isBetween(ang, d1, d2) {
 }
 
 
+function getToggleHandler(flag) {
+	return function(e) {
+		state[flag] = 1-state[flag];
+		e.target.className = e.target.className.replace(/(?:in)?active/, state[flag] ? "active" : "inactive");
+	}
+}
 

@@ -37,7 +37,7 @@ input[type=range] {
 	-webkit-user-select: none;
 }
 
-.active {
+.button.active {
 	-webkit-filter: brightness(175%);
 }
 
@@ -84,6 +84,15 @@ input[type=range] {
 	margin-right: 50px;
 }
 
+@media screen and (orientation: landscape) {
+	.overlay .icons {
+		margin-top: 20px;
+	}
+
+	.overlay p {
+		margin-top: 10px;
+	}
+}
 
 .overlay .icon {
 	margin: 8px 8px 4px 4px;
@@ -102,5 +111,7 @@ input[type=range] {
 	height: 30px;
 }
 
-	
+.icon.active {
+	background-color: rgb(50,255,50);
+}
 
