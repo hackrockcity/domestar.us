@@ -64,6 +64,7 @@ function setupIcon(id, handler) {
 	ele.addEventListener("touchstart", handler, false);
 }
 
+// Set up the icons (smaller buttons)
 function setupIcons() {
 	setupIcon("calibrate", handleStartCalibration);
 	setupIcon("calibrateN", handleCalibrate);
@@ -83,6 +84,7 @@ function handleDeviceOrientation(e) {
 	state['g'] = Math.floor(e.gamma);
 }
 
+// Update state when slider is moved
 function handleSizeDurationChange(e) {
 	state['s'] = e.target.value;
 }
@@ -128,11 +130,14 @@ function handleTick(e) {
 	}
 }
 
-function handleStartCalibration(e) {
+// Shows calibration screen
+function handleStartCalibration(e) {	
+	resetCalibration();
 	document.getElementById('calibrate').className = document.getElementById('calibrate').className.replace("inactive","active");
 	document.getElementById('calibration').style.top = "0px";
 }
 
+// Hides calibration screen
 function handleStopCalibration(e) {
 	document.getElementById('calibrate').className = document.getElementById('calibrate').className.replace("active","inactive");
 	document.getElementById('calibration').style.top = "-100%";
@@ -143,6 +148,7 @@ function handleStopCalibration(e) {
 	}
 }
 
+// Handles pressing a calibration button
 function handleCalibrate(e) {
 	var ele = e.target;
 	var dir = ele.id.replace("calibrate","");
@@ -156,6 +162,7 @@ function handleCalibrate(e) {
 	}
 }
 
+// Returns calibration from localstorage or an initialized object
 function getCalibration() {
 	return JSON.parse(window.localStorage.getItem("calibration")) || { 
 		"N": { "a":0, "b":0, "g":0 },
@@ -166,40 +173,74 @@ function getCalibration() {
 	};
 }
 
+// Drop our calibration settings
+function resetCalibration() {
+	calibration.calibrated = false;
+	window.localStorage.setItem("calibration", JSON.stringify(calibration));
+}
+
+// Update that we're calibrated and save that
 function finishCalibration() {
 	calibration.calibrated = true;
 	window.localStorage.setItem("calibration", JSON.stringify(calibration));
 }
 
+// Saves a calibration for a direction
 function setCalibration(dir) {
-	calibration[dir].a = (state.a+state.g)%360;
+	calibration[dir].a = state.a;
 	calibration[dir].b = state.b;
+	calibration[dir].g = state.g;
 	window.localStorage.setItem("calibration", JSON.stringify(calibration));
 }
 
 // TODO Change to Brian's triangulation code.
+// This walks each of the calibrated directions to locate where the current angle
+// sits between, calculates how far in the angle is, and then resets angle based
+// on fixed directions.
 function calculateCalibrated() {
 	if (calibration.calibrated) {
-		var xang = (state.a + state.g) % 360;
+		var xang = state.a;
 		var dirs = ['N','E','S','W','N'];
-		var homes = [0,90,180,270]; 
+		var homes = [360,270,180,90,0];
 
+		// For each starting direction
 		for (var i=0; i<4; i++) {
-			if (isBetween(xang, dirs[i], dirs[i+1])) {
-				var l = calibration[dirs[i]];
-				var h = calibration[dirs[i+1]];
-				var d = xang-l.a;
-				var r = d / Math.abs(h.a - l.a);
-				state['A'] = Math.floor(homes[i]+r*90);
+
+			// Check if we're between (and if so, how far)
+			var r = ratioBetween(xang, dirs[i], dirs[i+1]);
+
+			if (r) {
+				// Calculate where we would be if we were that far between
+				// the dome's totems.
+				state['A'] = Math.floor(homes[i+1]+r*90);
+
+				// B is seasier, just subtract out the average of the two floors
 				state['B'] = state.b - (l.b+h.b/2);
-				break;
+
+				return;
 			}
 		}
 	}
+
+	console.log("Can't locate " + xang);
 }
 
-function isBetween(ang, d1, d2) {
-	return ang>=calibration[d1].a && ang<calibration[d2].a;
+// If ang is between d1 and d2 returns a ratio of ang's distance travelled
+// across the two.
+function ratioBetween(ang, d1, d2) {
+	var a = Math.max(calibration[d1].a,calibration[d2].a);
+	var b = Math.min(calibration[d1].a,calibration[d2].a);
+
+	// Flip for the 360 degree barrier
+	if (a-b > 180) { 
+		var t=b; 
+		b=a-360; 
+		a=t; 
+
+		if (ang > 180) ang -= 360;
+	}
+
+	return (ang<=a && ang>b) ? (ang-b)/(a-b) : false;
 }
 
 
