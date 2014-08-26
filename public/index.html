@@ -21,22 +21,110 @@
 		</div>
 	</div>
 
-	<div id="calibration" class="hidden overlay">
-		<div id="closeCalibration" class="octicon octicon-x"></div>
-		<h2>Calibration</h2>
+	<canvas id="compass" width="280" height="40"></canvas>
 
-		<p>Hold phone like a TV remote</p>
-		<p>Point at a totem</p>
-		<p>Press the matching icon</p>
-		<p>Repeat for all four</p>
+	<div id="intro1" class="intro hidden overlay">
+		<div class="inner">
+			<div class="close octicon octicon-x"></div>
+			<h1>DomeStar</h1>
 
-		<div id="calibrationIcons" class="icons">
-			<div id="calibrateN" class="icon mega-octicon octicon-rocket not-ready"></div>
-			<div id="calibrateE" class="icon mega-octicon octicon-squirrel not-ready"></div>
-			<div id="calibrateS" class="icon mega-octicon octicon-beer not-ready"></div>
-			<div id="calibrateW" class="icon mega-octicon octicon-globe not-ready"></div>
+			<p><img src="domestarsm.jpg" /></p>
+
+			<p>DomeStar is an interactive LED display that you control using
+			a smartphone.</p>
+
+			<button data-next="intro2">Cool! Let's get started</button>
+
 		</div>
 	</div>
+
+	<div id="intro2" class="intro hidden overlay">
+		<div class="inner">
+			<div class="close octicon octicon-x"></div>
+			<h1>How it works</h1>
+
+			<p><img src="howto.gif" /></p>
+
+			<p>To paint on the dome, select a color and then use your phone
+			like a paintbrush.  Before we get started we'll need to calibrate
+			the sensors in your phone.</p>
+
+			<button data-next="intro3" data-compass="intro" data-reset-calibration="1">Ok!  Let's start calibration.</button>
+
+		</div>
+	</div>
+
+	<div id="intro3" class="intro hidden overlay">
+		<div class="inner">
+			<div class="close octicon octicon-x"></div>
+			<h1>Calibrate Rocket</h1>
+
+			<p><img src="rocket.jpg" /></p>
+
+			<p>Point the top of your phone (like it's a TV remote) at the 
+			rocket and press the button</p>
+
+			<button data-next="intro4" data-compass="intro" data-calibrate="N">Calibrate Rocket</button>
+		</div>
+	</div>
+
+	<div id="intro4" class="intro hidden overlay">
+		<div class="inner">
+			<div class="close octicon octicon-x"></div>
+			<h1>Calibrate Mug</h1>
+
+			<p><img src="beer.jpg" /></p>
+
+			<p>Point the top of your phone (like it's a TV remote) at the 
+			mug and press the button</p>
+
+			<button data-next="intro5" data-compass="intro" data-calibrate="E">Calibrate Mug</button>
+		</div>
+	</div>
+
+	<div id="intro5" class="intro hidden overlay">
+		<div class="inner">
+			<div class="close octicon octicon-x"></div>
+			<h1>Calibrate Squirrel</h1>
+
+			<p><img src="squirrel.jpg" /></p>
+
+			<p>Point the top of your phone (like it's a TV remote) at the 
+			squirrel and press the button</p>
+
+			<button data-next="intro6" data-compass="intro" data-calibrate="S">Calibrate Squirrel</button>
+		</div>
+	</div>
+
+	<div id="intro6" class="intro hidden overlay">
+		<div class="inner">
+			<div class="close octicon octicon-x"></div>
+			<h1>Calibrate Globe</h1>
+
+			<p><img src="globe.jpg" /></p>
+
+			<p>Point the top of your phone (like it's a TV remote) at the 
+			globe and press the button</p>
+
+			<button data-next="intro7" data-calibrate="W" data-finish-calibration="1">Calibrate Globe</button>
+		</div>
+	</div>
+
+	<div id="intro7" class="intro hidden overlay">
+		<div class="inner">
+			<div class="close octicon octicon-x"></div>
+			<h1>You're all set!</h1>
+
+			<p><img src="howto.gif" /></p>
+
+			<p>Select a color and go nuts.  For best results, stay
+			standing where you are.</p>
+
+			<button data-compass="normal">LET'S GO!</button>
+		</div>
+	</div>
+
+
 	<script src="domestar.js" type="text/javascript"></script>
 </body>
 </html>

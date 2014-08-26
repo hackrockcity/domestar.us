@@ -1,7 +1,9 @@
+var isMobile = typeof(window.orientation) !== "undefined";
+var touchEvent = isMobile ? "touchstart" : "mousedown";
 var state = { "id":genid(), "a":0, "b":0, "g":0, "s":5, "c":0, "f":0, "p":0, "P":0 };
 var calibration = getCalibration(); 
 var timer;
-var wsLocalUrl = "ws://wsl.domestar.us:8000/phone";
+var wsLocalUrl = "ws://wsl2.domestar.us:8000/phone";
 var wsRemoteUrl = "ws://ws.domestar.us:8000/phone";
 var wsl;
 var wsr;
@@ -18,6 +20,8 @@ function setup() {
 
 	setupButtons();
 	setupIcons();
+	setupIntro();
+
 	wsl = setupWebsocket(wsLocalUrl);
 	wsr = setupWebsocket(wsRemoteUrl);
 }
@@ -51,7 +55,7 @@ function setupButtons() {
 		var div = document.createElement('div');
 		div.className='button';
 	
-		div.addEventListener('touchstart', handleDown, false);
+		div.addEventListener(touchEvent, handleDown, false);
 		div.setAttribute('data-hue', h);
 		div.style.backgroundColor = "hsl("+h+",100%,70%)";
 
@@ -61,17 +65,12 @@ function setupButtons() {
 
 function setupIcon(id, handler) {
 	var ele = document.getElementById(id);
-	ele.addEventListener("touchstart", handler, false);
+	ele.addEventListener(touchEvent, handler, false);
 }
 
 // Set up the icons (smaller buttons)
 function setupIcons() {
-	setupIcon("calibrate", handleStartCalibration);
-	setupIcon("calibrateN", handleCalibrate);
-	setupIcon("calibrateE", handleCalibrate);
-	setupIcon("calibrateS", handleCalibrate);
-	setupIcon("calibrateW", handleCalibrate);
-	setupIcon("closeCalibration", handleStopCalibration);
+	setupIcon("calibrate", function() { document.getElementById('intro1').className = "shown intro overlay"; });
 	setupIcon("flame", getToggleHandler("f"));
 	setupIcon("pulse", getToggleHandler("p"));
 	setupIcon("paint", getToggleHandler("P"));
@@ -82,6 +81,9 @@ function handleDeviceOrientation(e) {
 	state['a'] = Math.floor(e.alpha);
 	state['b'] = Math.floor(e.beta);
 	state['g'] = Math.floor(e.gamma);
+
+	calculateCalibrated();
+	drawCompass();
 }
 
 // Update state when slider is moved
@@ -118,8 +120,6 @@ function handleDown(e) {
 
 // Send current state to local or remote
 function handleTick(e) {
-	calculateCalibrated();
-
 	var msg = JSON.stringify(state);
 
 	if (wsl.readyState == 1) {
@@ -127,38 +127,6 @@ function handleTick(e) {
 	}
 	else if (wsr.readyState == 1) {
 		wsr.send(msg);
-	}
-}
-
-// Shows calibration screen
-function handleStartCalibration(e) {	
-	resetCalibration();
-	document.getElementById('calibrate').className = document.getElementById('calibrate').className.replace("inactive","active");
-	document.getElementById('calibration').style.top = "0px";
-}
-
-// Hides calibration screen
-function handleStopCalibration(e) {
-	document.getElementById('calibrate').className = document.getElementById('calibrate').className.replace("active","inactive");
-	document.getElementById('calibration').style.top = "-100%";
-
-	var eles = document.querySelectorAll("#calibrationIcons .ready");
-	for (var i=0; i<eles.length; i++) {
-		eles[i].className = eles[i].className.replace("ready","not-ready");
-	}
-}
-
-// Handles pressing a calibration button
-function handleCalibrate(e) {
-	var ele = e.target;
-	var dir = ele.id.replace("calibrate","");
-
-	setCalibration(dir);
-	ele.className = ele.className.replace("not-ready","ready");
-
-	if (!document.querySelector("#calibrationIcons .not-ready")) {
-		finishCalibration();
-		handleStopCalibration();
 	}
 }
 
@@ -215,7 +183,7 @@ function calculateCalibrated() {
 				state['A'] = Math.floor(homes[i+1]+r*90);
 
 				// B is seasier, just subtract out the average of the two floors
-				state['B'] = state.b - (l.b+h.b/2);
+				state['B'] = state.b - (calibration[dirs[i]].b+calibration[dirs[i+1]].b/2);
 
 				return;
 			}
@@ -248,6 +216,80 @@ function getToggleHandler(flag) {
 	return function(e) {
 		state[flag] = 1-state[flag];
 		e.target.className = e.target.className.replace(/(?:in)?active/, state[flag] ? "active" : "inactive");
+	}
+}
+
+function setupIntro() {
+	console.log("Setup Intro");
+
+	var closes = document.querySelectorAll('.intro .close');
+	for (var i=0; i<closes.length; i++) {
+		closes[i].addEventListener("click", function(e) {
+			e.target.parentNode.parentNode.className = "hidden intro overlay";
+			document.getElementById('compass').className = "normal";
+		});
+	}
+
+	var buttons = document.querySelectorAll('.intro button');
+	for (var i=0; i<buttons.length; i++) {
+		buttons[i].addEventListener("click", function(e) { 
+			e.target.parentNode.parentNode.className = "hidden intro overlay";
+
+			if (e.target.hasAttribute('data-next')) {
+				document.getElementById(e.target.getAttribute('data-next')).className = "shown intro overlay";
+			}
+
+			var compass = document.getElementById('compass');
+			if (e.target.hasAttribute('data-compass')) {
+				console.log("Setting up compass");
+				compass.className = e.target.getAttribute('data-compass');
+			}
+			else {
+				compass.className = "normal";
+			}
+
+			if (e.target.hasAttribute("data-reset-calibration")) {
+				resetCalibration();
+			}
+
+			if (e.target.hasAttribute("data-calibrate")) {
+				setCalibration(e.target.getAttribute("data-calibrate"));
+			}
+
+			if (e.target.hasAttribute("data-finish-calibration")) {
+				finishCalibration();
+			}
+		});
+	}
+
+	document.getElementById('intro1').className = "shown intro overlay";
+}
+
+function drawCompass() {
+	var canvas = document.getElementById('compass');
+
+	if (canvas.style.display != "none") {
+		var ctx = canvas.getContext('2d');
+		var calibrated = calibration.calibrated && typeof(state['A']) != "undefined"
+		var angle = calibrated ? state['A'] : state['a'];
+		var msg = calibrated ? state['A'] + "(" + state['a'] + ")" : angle;
+
+		ctx.clearRect(0,0,320,40);
+		ctx.strokeStyle = ctx.fillStyle = calibrated ? "black" : "#aa0000";
+		ctx.textAlign = "center";
+		ctx.fillText(msg, 160, 35);
+	
+		for (var i=0; i<20; i++) {
+			var a = angle - 10 + i;
+	
+			if (a % 2 == 0) {
+				ctx.fillRect(i*14,2,1,5);
+			}
+	
+			if (a % 10 == 0) {
+				ctx.fillRect(i*14,2,1,15);
+			}
+		}
 	}
 }
 
