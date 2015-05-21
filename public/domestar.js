@@ -274,10 +274,10 @@ function drawCompass() {
 		var angle = calibrated ? state['A'] : state['a'];
 		var msg = calibrated ? state['A'] + "(" + state['a'] + ")" : angle;
 
-		ctx.clearRect(0,0,320,40);
+		ctx.clearRect(0,0,280,40);
 		ctx.strokeStyle = ctx.fillStyle = calibrated ? "black" : "#aa0000";
 		ctx.textAlign = "center";
-		ctx.fillText(msg, 160, 35);
+		ctx.fillText(msg, 140, 35);
 	
 		for (var i=0; i<20; i++) {
 			var a = angle - 10 + i;
